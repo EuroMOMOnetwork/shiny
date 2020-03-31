@@ -1,15 +1,24 @@
 # Combine EuroMOMO data and population data -------------------------------
 
 source('R/GetData.R')
-data <- GetData('2020-W06')
-data <- cbind( data, GetData('2020-W07'))
-data <- cbind( data, GetData('2020-W08'))
-data <- cbind( data, GetData('2020-W09'))
-data <- cbind( data, GetData('2020-W10'))
-data <- cbind( data, GetData('2020-W11'))
-data <- cbind( data, GetData('2020-W12'))
+data <- GetData('2019-W01')
+data <- rbind( data, GetData('2019-W02'))
+data <- rbind( data, GetData('2019-W03'))
+data <- rbind( data, GetData('2019-W04'))
+data <- rbind( data, GetData('2019-W05'))
+data <- rbind( data, GetData('2019-W06'))
+data <- rbind( data, GetData('2019-W07'))
+data <- rbind( data, GetData('2019-W08'))
+data <- rbind( data, GetData('2019-W09'))
+data <- rbind( data, GetData('2019-W10'))
+data <- rbind( data, GetData('2019-W11'))
+data <- rbind( data, GetData('2019-W12'))
 
 saveRDS(data, file = 'data/Data.RDS')
+
+X <- data[, N := sum(N), keyby = .(reporting, country, group, ISOweek, nb, nbc, pnb, Vexcess, NUTS)]
+
+
 
 # Fake country ------------------------------------------------------------
 data <- merge(data, cbind(country = unique(data$country),
@@ -29,7 +38,7 @@ saveRDS(data, file = 'data/FakeData.RDS')
 source('R/NumberGraph.R')
 
 data <- readRDS(file = 'data/FakeData.RDS')
-print(NumberGraph(data, 'country3', '2019-W41', '15to64'))
+print(NumberGraph(data, 'England', '2019-W01', '15to64'))
 
 
 # Z-score graph

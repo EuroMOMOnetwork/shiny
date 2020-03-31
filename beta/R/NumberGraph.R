@@ -8,11 +8,17 @@
 #' @import ggplot2
 #' @return graph
 #' @export
-NumberGraph <- function(dt, c, a, g) {
+NumberGraph <- function(dt, c, r, g) {
   library(data.table)
   library(ggplot2)
 
-  dt <-  setDT(dt)[(country == c) & (aggregation == a) & (group == g),
+  dt <- data
+  c <- 'England'
+  r <- '2019-W01'
+  g <- '15to64'
+  
+  
+  dt <-  setDT(dt)[(country == c) & (reporting == r) & (group == g),
                    .(nb, nbc, pnb,
                      sdm2 = max(0, pnb - 2*sqrt(Vexcess)),
                      sd2 = pnb + 2*sqrt(Vexcess),
@@ -34,7 +40,7 @@ NumberGraph <- function(dt, c, a, g) {
                          breaks = c("darkgreen", "red", 'black', 'blue'),
                          labels = c("Observed", "Baseline", "2 z-scores", "4 z-scores"),
                          guide = "legend") +
-    labs(caption = paste('Data reported:', a))
+    labs(caption = paste('Data reported:', r))
 
   return(graph)
 }
