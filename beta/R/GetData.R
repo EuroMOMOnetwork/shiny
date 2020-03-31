@@ -51,6 +51,9 @@ GetData <- function(ReportingWeek) {
                         group by a.reporting, a. country, a.[group], a.ISOweek, a.nb, a.nbc, a.pnb, a.Vexcess, b.NUTS
                       ")
   
+  # Sum population data for countries with more NUTS-codes (England)
+  setDT(data)[, N := sum(N), by = .(reporting, country, group, ISOweek)]
+  
   # Not full population
   data[(data$country == "Italy"), "N"] <- 0.15*data[(data$country == "Italy"), "N"]
   data[(data$country == "Spain"), "N"] <- 0.92*data[(data$country == "Spain"), "N"]

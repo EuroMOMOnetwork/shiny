@@ -14,9 +14,7 @@ data <- rbind( data, GetData('2019-W10'))
 data <- rbind( data, GetData('2019-W11'))
 data <- rbind( data, GetData('2019-W12'))
 
-saveRDS(data, file = 'data/Data.RDS')
-
-X <- data[, N := sum(N), keyby = .(reporting, country, group, ISOweek, nb, nbc, pnb, Vexcess, NUTS)]
+# saveRDS(data, file = 'data/Data.RDS')
 
 
 
@@ -31,7 +29,6 @@ data$FakeCountry <- NULL
 saveRDS(data, file = 'data/FakeData.RDS')
 
 
-
 # Graph functions ---------------------------------------------------------
 
 # Number graph
@@ -40,9 +37,14 @@ source('R/NumberGraph.R')
 data <- readRDS(file = 'data/FakeData.RDS')
 print(NumberGraph(data, 'England', '2019-W01', '15to64'))
 
-
 # Z-score graph
 source('R/ZscoreGraph.R')
 
 data <- readRDS(file = 'data/FakeData.RDS')
 print(ZscoreGraph(data, 'country3', '2019-W41', '15to64'))
+
+# Mortality rate graph
+source('R/MRGraph.R')
+
+data <- readRDS(file = 'data/FakeData.RDS')
+print(MRGraph(data, 'country3', '2019-W05', '15to64'))

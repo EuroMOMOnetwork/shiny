@@ -8,7 +8,7 @@ library(shinydashboard)
 library(shinyWidgets)
 
 
-data <- readRDS("data/Data.rds")
+data <- readRDS("C:/Users/ANEH/Desktop/EuroMoMo/Data.rds")
 
 ########################################################################
 # Dashboard EuroMOMO
@@ -66,7 +66,7 @@ body <- dashboardBody(
            tabPanel("Number graphs",icon = icon("chart-line","fa-lg"),
                     fluidRow(
                       column(width=12,
-                             plotOutput("pnb", height = 750,
+                             plotOutput("pnb", height = 650,
                                         dblclick = "MyPlot_dblclick",
                                         brush = brushOpts(
                                           id = "MyPlot_brush",
@@ -81,7 +81,7 @@ body <- dashboardBody(
            tabPanel("Z-score graphs",icon = icon("chart-bar","fa-lg"),
                     fluidRow(
                       column(width=12,
-                             plotOutput("zsc", height = 750,
+                             plotOutput("zsc", height = 650,
                                         dblclick = "MyPlot_dblclick",
                                         brush = brushOpts(
                                           id = "MyPlot_brush",
@@ -227,7 +227,7 @@ server <- function(input,output,session) {
             left_px <- hover$range$left + (hover$x - hover$domain$left) / (hover$domain$right - hover$domain$left) * (hover$range$right - hover$range$left)
             top_px <- hover$range$top +(hover$domain$top - hover$y) / (hover$domain$top - hover$domain$bottom) * (hover$range$bottom - hover$range$top)
             
-            style <- paste0("position:absolute; z-index:100;", "left:", left_px + 2, "px; top:", top_px + 2, "px;")
+            style <- paste0("position:absolute; z-index:100;", "left:", left_px - 200, "px; top:", top_px + 2, "px;")
             
             wellPanel(
               style = style,

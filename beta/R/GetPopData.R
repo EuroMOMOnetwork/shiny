@@ -65,7 +65,7 @@ GetPopData <- function(StartYear, EndYear, NUTSdata = NULL) {
   pop_data$year <- NULL
   
   # Keep only (NUTS, age) with at least two non-NA
-  pop_data[ , number_of_na := sum(!is.na(N)), by = .(NUTS, age)]
+  pop_data[, number_of_na := sum(!is.na(N)), by = .(NUTS, age)]
   pop_data <- pop_data[number_of_na >= 2]
   pop_data$number_of_na <- NULL
   
