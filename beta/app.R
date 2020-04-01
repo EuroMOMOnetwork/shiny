@@ -8,7 +8,7 @@ library(shinydashboard)
 library(shinyWidgets)
 
 
-data <- readRDS("C:/Users/ANEH/Desktop/EuroMoMo/Data.rds")
+data <- readRDS("data/Data.rds")
 
 ########################################################################
 # Dashboard EuroMOMO
