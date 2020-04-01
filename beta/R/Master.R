@@ -1,6 +1,22 @@
 # Combine EuroMOMO data and population data -------------------------------
 
 source('R/GetData.R')
+data <- GetData('2019-W02')
+data <- rbind( data, GetData('2019-W03'))
+data <- rbind( data, GetData('2019-W04'))
+data <- rbind( data, GetData('2019-W05'))
+data <- rbind( data, GetData('2019-W06'))
+data <- rbind( data, GetData('2019-W07'))
+data <- rbind( data, GetData('2019-W08'))
+data <- rbind( data, GetData('2019-W09'))
+data <- rbind( data, GetData('2019-W10'))
+data <- rbind( data, GetData('2019-W11'))
+data <- rbind( data, GetData('2019-W12'))
+data <- rbind( data, GetData('2019-W13'))
+
+# saveRDS(data, file = 'data/Data.RDS')
+
+source('R/GetData.R')
 data <- GetData('2019-W01')
 data <- rbind( data, GetData('2019-W02'))
 data <- rbind( data, GetData('2019-W03'))
@@ -16,17 +32,17 @@ data <- rbind( data, GetData('2019-W12'))
 
 # saveRDS(data, file = 'data/Data.RDS')
 
-
-
 # Fake country ------------------------------------------------------------
-data <- merge(data, cbind(country = unique(data$country),
+FakeData <- subset(data, country != 'Pooled')
+FakeData <- merge(FakeData, cbind(country = unique(FakeData$country),
                           FakeCountry = paste0('country',
-                                               sample(as.numeric(unique(factor(data$country))), length(as.numeric(unique(factor(data$country))))))),
+                                               sample(as.numeric(unique(factor(FakeData$country))), length(as.numeric(unique(factor(FakeData$country))))))),
               by = 'country')
-data$country <- data$FakeCountry
-data$FakeCountry <- NULL
+FakeData$country <- FakeData$FakeCountry
+FakeData$FakeCountry <- NULL
+FakeData <- rbind(FakeData, subset(data, country == 'Pooled'))
 
-saveRDS(data, file = 'data/FakeData.RDS')
+saveRDS(FakeData, file = 'data/FakeData.RDS')
 
 
 # Graph functions ---------------------------------------------------------
