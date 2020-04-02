@@ -19,7 +19,7 @@ GetPopData <- function(StartYear, EndYear, NUTSdata = NULL) {
   # library(dplyr)
   # library(ISOweek)
   
-  # NUTSdata <- data.table(NUTS = unique(pop_data$NUTS))[sample(.N, 6)]
+  # NUTSdata <- CountryNUTS
   # NUTSdata <- NULL
   # StartYear <- 2015
   # EndYear <- 2021
@@ -51,9 +51,9 @@ GetPopData <- function(StartYear, EndYear, NUTSdata = NULL) {
   pop_data[, c('N.x', 'N.y')] <- NULL
   
   rm(pop_proj)
-  
+
   pop_data$ISOweek <- ISOweek::ISOweek(as.Date(paste0(pop_data$year, '-01-01')))
-  
+
   # Expand to cover all ISOweeks
   pop_data <- merge.data.table(pop_data,
                                expand.grid(NUTS = unique(pop_data$NUTS),
@@ -65,7 +65,7 @@ GetPopData <- function(StartYear, EndYear, NUTSdata = NULL) {
   pop_data$year <- NULL
   
   # Keep only (NUTS, age) with at least two non-NA
-  pop_data[, number_of_na := sum(!is.na(N)), by = .(NUTS, age)]
+  pop_data[order(NUTS, age) , number_of_na := sum(!is.na(N)), by = .(NUTS, age)]
   pop_data <- pop_data[number_of_na >= 2]
   pop_data$number_of_na <- NULL
   
@@ -73,6 +73,6 @@ GetPopData <- function(StartYear, EndYear, NUTSdata = NULL) {
   pop_data$wk <- as.numeric(as.factor(pop_data$ISOweek))
   pop_data[, N := approx(wk, N, rule = 2, xout = seq(min(wk), max(wk)))$y, keyby = .(NUTS, age)]
   pop_data$wk <- NULL
-  
+
   return(pop_data)
 }

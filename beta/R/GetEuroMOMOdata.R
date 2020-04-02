@@ -7,6 +7,7 @@
 #' @import data.table
 #' @import ISOweek
 #' @import RODBC
+#' @import stringr
 #' @return data table with:
 #'  country - country name
 #'  group - age group
@@ -18,6 +19,7 @@ GetEuroMOMOdata <- function(week) {
   library(data.table)
   # library(ISOweek)
   # library(RODBC)
+  # library(stringr)
   
   # week <- '2020-W13'
   
@@ -39,7 +41,8 @@ GetEuroMOMOdata <- function(week) {
   rm(con)
   
   EuroMOMOdata$ISOweek <- paste0(EuroMOMOdata$yodi, '-W', sprintf('%02d', EuroMOMOdata$wodi))
-  EuroMOMOdata <- setDT(EuroMOMOdata)[, .(country, group, ISOweek,
+  EuroMOMOdata <- setDT(EuroMOMOdata)[, .(country = stringr::str_to_title(country),
+                                          group, ISOweek,
                                           nb = as.numeric(nb),
                                           nbc = as.numeric(nbc),
                                           pnb = as.numeric(pnb),
