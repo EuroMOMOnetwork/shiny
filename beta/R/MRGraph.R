@@ -12,15 +12,20 @@ MRGraph <- function(dt, c, r, g) {
   library(data.table)
   library(ggplot2)
   
+  # dt <- data
+  # c <- 'England'
+  # r <- '2020-W13'
+  # g <- '65 years or older'
+  
   dt <-  setDT(dt)[(country == c) & (reporting == r) & (group == g),
                    .(nb = nb/(N/100000),
                      nbc = nbc/(N/100000),
                      pnb = pnb/(N/100000),
-                     sdm2 = max(0, pnb - 2*sqrt(Vexcess))/(N/100000),
-                     sd2 = (pnb + 2*sqrt(Vexcess))/(N/100000),
-                     sd4 = (pnb + 4*sqrt(Vexcess))/(N/100000)
+                     sdm2 = (max(0,pnb^(2/3)-2*(nbc^(2/3)-pnb^(2/3))/zscore)^(3/2))/(N/100000),
+                     sd2 = ((pnb^(2/3)+2*(nbc^(2/3)-pnb^(2/3))/zscore)^(3/2))/(N/100000),
+                     sd4 = ((pnb^(2/3)+4*(nbc^(2/3)-pnb^(2/3))/zscore)^(3/2))/(N/100000)
                    ), keyby = ISOweek]
-  
+
   dt$wk = as.numeric(as.factor(dt$ISOweek))
   graph <- ggplot(dt, aes(x = wk)) +
     geom_line(aes(y = nbc, colour="darkgreen"), linetype="solid", size = 1) +

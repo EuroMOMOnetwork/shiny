@@ -14,14 +14,14 @@ NumberGraph <- function(dt, c, r, g) {
 
   # dt <- data
   # c <- 'England'
-  # r <- '2019-W01'
-  # g <- '15to64'
-
+  # r <- '2020-W13'
+  # g <- '15-64 years'
+  
   dt <- setDT(dt)[(country == c) & (reporting == r) & (group == g),
                   .(nb, nbc, pnb,
-                    sdm2 = max(0, pnb - 2*sqrt(Vexcess)),
-                    sd2 = pnb + 2*sqrt(Vexcess),
-                    sd4 = pnb + 4*sqrt(Vexcess)
+                    sdm2 = max(0,pnb^(2/3)-2*(nbc^(2/3)-pnb^(2/3))/zscore)^(3/2),
+                    sd2 = (pnb^(2/3)+2*(nbc^(2/3)-pnb^(2/3))/zscore)^(3/2),
+                    sd4 = (pnb^(2/3)+4*(nbc^(2/3)-pnb^(2/3))/zscore)^(3/2)
                   ), keyby = ISOweek]
   
   dt$wk = as.numeric(as.factor(dt$ISOweek))
