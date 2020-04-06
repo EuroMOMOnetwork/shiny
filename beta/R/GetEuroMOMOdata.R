@@ -21,14 +21,12 @@ GetEuroMOMOdata <- function(week) {
   # library(RODBC)
   # library(stringr)
   
-  # week <- '2020-W13'
-  
   # Week of aggregation
   Aweek <- ISOweek::ISOweek(as.Date(ISOweek::ISOweek2date(paste0(week, '-7')) + 3))
   
   # EuroMOMO data from database 
   con <- RODBC::odbcConnect("euromomo", readOnlyOptimize = TRUE)
-  EuroMOMOdata <- RODBC::sqlQuery(con, paste0("
+  EuroMOMOdata <- setDT(RODBC::sqlQuery(con, paste0("
       set transaction isolation level read uncommitted;
       set deadlock_priority 5;
       select country, [group], yodi, wodi, nb, nbc, pnb, zscore from IB_EuroMOMO.dbo.Record with(nolock)
@@ -36,18 +34,18 @@ GetEuroMOMOdata <- function(week) {
       (nbc is not NULL) and (pnb is not NULL) and (substring(country,1,13) <> 'All countries') and (country <> 'Europe') and
       ([group] in('0to4', '15to64', '5to14', '65P', '65to74', '75to84', '85P', 'Total'))
       order by country, [group], yodi, wodi
-     "), stringsAsFactors = FALSE, as.is = TRUE)
+     "), stringsAsFactors = FALSE, as.is = TRUE))
   RODBC::odbcClose(con)
   rm(con)
   
-  EuroMOMOdata$ISOweek <- paste0(EuroMOMOdata$yodi, '-W', sprintf('%02d', EuroMOMOdata$wodi))
-  EuroMOMOdata <- setDT(EuroMOMOdata)[, .(country = stringr::str_to_title(country),
-                                          group, ISOweek,
-                                          nb = as.numeric(nb),
-                                          nbc = as.numeric(nbc),
-                                          pnb = as.numeric(pnb),
-                                          Vexcess = (((as.numeric(nbc)^(2/3)-as.numeric(pnb)^(2/3))/as.numeric(zscore))^2)/(as.numeric(pnb)^(2*2/3-2)))
-                                      ]
+  EuroMOMOdata[, `:=`(country = stringr::str_to_title(country),
+                      ISOweek = paste0(yodi, '-W', sprintf('%02d', wodi)),
+                      nb = as.numeric(nb),
+                      nbc = as.numeric(nbc),
+                      pnb = as.numeric(pnb),
+                      Vexcess = (((as.numeric(nbc)^(2/3)-as.numeric(pnb)^(2/3))/as.numeric(zscore))^2)/(as.numeric(pnb)^(2*2/3-2)),
+                      yodi = NULL, wodi = NULL, zscore = NULL)
+               ]
   # Pooling
   pooled <- NULL
   for (g in unique(EuroMOMOdata$group)) {
@@ -65,6 +63,8 @@ GetEuroMOMOdata <- function(week) {
   
   # Combine country and pooled data
   EuroMOMOdata <- cbind(reporting = week, rbind(EuroMOMOdata, cbind(country = "Pooled", pooled)))
+  
+  EuroMOMOdata[, zscore := (nbc^(2/3)-pnb^(2/3))/sqrt((pnb^(2*2/3-2))*Vexcess)]
   
   return(EuroMOMOdata)
 }

@@ -2,18 +2,19 @@
 
 source('R/GetData.R')
 data <- GetData('2020-W01')
-data <- rbind( data, GetData('2020-W02'))
-data <- rbind( data, GetData('2020-W03'))
-data <- rbind( data, GetData('2020-W04'))
-data <- rbind( data, GetData('2020-W05'))
-data <- rbind( data, GetData('2020-W06'))
-data <- rbind( data, GetData('2020-W07'))
-data <- rbind( data, GetData('2020-W08'))
-data <- rbind( data, GetData('2020-W09'))
-data <- rbind( data, GetData('2020-W10'))
-data <- rbind( data, GetData('2020-W11'))
-data <- rbind( data, GetData('2020-W12'))
-data <- rbind( data, GetData('2020-W13'))
+data <- rbind(data, GetData('2020-W02'))
+data <- rbind(data, GetData('2020-W03'))
+data <- rbind(data, GetData('2020-W04'))
+data <- rbind(data, GetData('2020-W05'))
+data <- rbind(data, GetData('2020-W06'))
+data <- rbind(data, GetData('2020-W07'))
+data <- rbind(data, GetData('2020-W08'))
+data <- rbind(data, GetData('2020-W09'))
+data <- rbind(data, GetData('2020-W10'))
+data <- rbind(data, GetData('2020-W11'))
+data <- rbind(data, GetData('2020-W12'))
+data <- rbind(data, GetData('2020-W13'))
+data <- rbind(data, GetData('2020-W14'))
 
 saveRDS(data, file = 'data/Data.RDS')
 
@@ -24,19 +25,25 @@ saveRDS(subset(data, country == 'Pooled'), file = 'data/PooledData.RDS')
 
 source('R/GetData.R')
 data <- GetData('2019-W01')
-data <- rbind( data, GetData('2019-W02'))
-data <- rbind( data, GetData('2019-W03'))
-data <- rbind( data, GetData('2019-W04'))
-data <- rbind( data, GetData('2019-W05'))
-data <- rbind( data, GetData('2019-W06'))
-data <- rbind( data, GetData('2019-W07'))
-data <- rbind( data, GetData('2019-W08'))
-data <- rbind( data, GetData('2019-W09'))
-data <- rbind( data, GetData('2019-W10'))
-data <- rbind( data, GetData('2019-W11'))
-data <- rbind( data, GetData('2019-W12'))
+data <- rbind(data, GetData('2019-W02'))
+data <- rbind(data, GetData('2019-W03'))
+data <- rbind(data, GetData('2019-W04'))
+data <- rbind(data, GetData('2019-W05'))
+data <- rbind(data, GetData('2019-W06'))
+data <- rbind(data, GetData('2019-W07'))
+data <- rbind(data, GetData('2019-W08'))
+data <- rbind(data, GetData('2019-W09'))
+data <- rbind(data, GetData('2019-W10'))
+data <- rbind(data, GetData('2019-W11'))
+data <- rbind(data, GetData('2019-W12'))
+
 
 FakeData <- subset(data, country != 'Pooled')
+FakeData <- merge(FakeData,
+                  cbind(NUTS = unique(FakeData$NUTS), FakeNUTS = unique(FakeData$NUTS)[sample(length(unique(FakeData$NUTS)))]),
+                  by = 'NUTS')
+FakeData$NUTS <- FakeData$FakeNUTS
+FakeData$FakeNUTS <- NULL
 FakeData <- merge(FakeData, cbind(country = unique(FakeData$country),
                           FakeCountry = paste0('country',
                                                sample(as.numeric(unique(factor(FakeData$country))), length(as.numeric(unique(factor(FakeData$country))))))),
@@ -44,8 +51,6 @@ FakeData <- merge(FakeData, cbind(country = unique(FakeData$country),
 FakeData$country <- FakeData$FakeCountry
 FakeData$FakeCountry <- NULL
 FakeData <- rbind(FakeData, subset(data, country == 'Pooled'))
-
-FakeData$NUTS <- NA
 
 saveRDS(FakeData, file = 'data/FakeData.RDS')
 

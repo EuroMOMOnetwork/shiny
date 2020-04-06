@@ -38,26 +38,24 @@ GetData <- function(ReportingWeek) {
   StartYear <- as.numeric(substr(ISOweek::ISOweek(as.Date(ISOweek::ISOweek2date(paste0(ReportingWeek, '-4')))), 1, 4)) - 6
   source('R/GetPopData.R')
   pop_data <- merge(GetPopData(StartYear, EndYear, CountryNUTS), CountryNUTS, by = 'NUTS', all.x = TRUE, allow.cartesian = TRUE)
-
+  
   # Merge data and population data
   data$group <- gsub('P', 'to100', data$group, ignore.case = TRUE)
   data <- data[, c("StartAge", "EndAge") := tstrsplit(group, "to", fixed=TRUE)][]
-  data <- sqldf::sqldf("select a.reporting, a.country, a.[group], a.ISOweek, a.nb, a.nbc, a.pnb, a.Vexcess, sum(b.N) as N, b.NUTS from
+  data <- sqldf::sqldf("select a.reporting, a.country, a.[group], a.ISOweek, a.nb, a.nbc, a.pnb, a.Vexcess, a.zscore, sum(b.N) as N, b.NUTS from
                         data as a
                         left join
                         pop_data as b
                         on (upper(a.country) = upper(b.NUTS_NAME)) and (a.ISOweek = b.ISOweek) and
                         (((a.StartAge <= b.age) and (b.age <= a.EndAge) and (a.[group] <> 'Total') and (b.age <> 999)) or
                         ((a.[group] = 'Total') and (b.age = 999)))
-                        group by a.reporting, a.country, a.[group], a.ISOweek, a.nb, a.nbc, a.pnb, a.Vexcess, b.NUTS
+                        group by a.reporting, a.country, a.[group], a.ISOweek, a.nb, a.nbc, a.pnb, a.Vexcess, a.zscore, b.NUTS
                       ")
-
+  
   setDT(data)[, group := dplyr::recode(group, "0to4" = "0-4 years", "5to14" = "5-14 years", "15to64" = "15-64 years", "65to100" = "65 years or older",
                                        "65to74" = "65-74 years", "75to84" = "75-84 years", "85to100" = "85 years or older", "Total" = "All ages")]
   
   # Pooled population
-  
-  
   data <- merge(data, data[ country != 'Pooled', .(country = 'Pooled', N = sum(N, na.rm = TRUE)),
                             keyby = .(reporting, group, ISOweek)], by = c('reporting', 'country', 'group', 'ISOweek'), all.x = TRUE)
   data$N <- pmax(data$N.x, data$N.y, na.rm = TRUE)

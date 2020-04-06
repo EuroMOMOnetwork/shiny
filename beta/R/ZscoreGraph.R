@@ -11,9 +11,14 @@
 ZscoreGraph <- function(dt, c, r, g) {
   library(data.table)
   library(ggplot2)
-
-  dt <-  setDT(dt)[(country == c) & (reporting == r) & (group == g), .(zscore = (nbc - pnb)/sqrt(Vexcess)), keyby = ISOweek]
-
+  
+  # dt <- data
+  # c <- 'England'
+  # r <- '2020-W13'
+  # g <- '65 years or older'
+  
+  dt <-  setDT(dt)[(country == c) & (reporting == r) & (group == g)]
+                   
   dt$wk = as.numeric(as.factor(dt$ISOweek))
   graph <- ggplot(dt, aes(x = wk)) +
     geom_line(aes(y = zscore), linetype="solid", color="darkgreen", size = 1) +
